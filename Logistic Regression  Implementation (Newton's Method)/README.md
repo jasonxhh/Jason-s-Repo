@@ -1,3 +1,3 @@
-# Jason's Repo
+# A logistic regression implementation with the Newton Raphson Method in R
 
-Hi, my name is Jason Huang, and I am currently studying Economics, Finance and Mathematics at UBC. My repo here has a collection of various projects I am working on or have completed.
+I heavily follow the derivations from http://czep.net/stat/mlelr.pdf
