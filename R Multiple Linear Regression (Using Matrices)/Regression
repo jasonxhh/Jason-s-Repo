@@ -24,6 +24,3 @@ plot2 <- ggplot(dat.df,aes(TV,R))
 plot2+geom_point()+geom_hline(yintercept = 0, col = "blue", lwd = 1)+
   labs(title = "TV residuals")
 labs(y = "Residuals")
-
-# Random draws from a normal distribution
-norm1 <- rnorm(1000, 0, 0.001)
