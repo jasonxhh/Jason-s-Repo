@@ -1,3 +1,3 @@
-# Jason's Repo
+# A simple finite differencing example in matlab, from my math 307 homework
 
-Hi, my name is Jason Huang, and I am currently studying Economics, Finance and Mathematics at UBC. My repo here has a collection of various projects I am working on or have completed.
+Define the function G(x; ξ) as the solution of the boundary value problem.
