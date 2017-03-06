@@ -1,0 +1,85 @@
+#implementation based on derivations from http://czep.net/stat/mlelr.pdf
+#packages
+library(OpenMX)
+
+#read data
+data <- read.csv("BreastCancer.csv")[,-1]
+data <- na.omit(data)
+
+#define n globally
+n <- nrow(data)
+
+#get needed matrices and vectors
+X <- data[,1:9]
+Y <- data[,10]
+Ystar <- data.matrix(Y, rownames.force = NA)
+Xstar <- data.matrix(cbind(1,X), rownames.force = NA)
+XT <- t(Xstar)
+
+#function to minimize
+ssquares <- function(logit1, logit2) 
+{
+  sum((logit1 - logit2)^2) / n
+}
+
+#function to get Pi vector, where B is the vectors of Betas
+computePi <- function(B) {
+  sum <- Xstar %*% B
+  expsum <- exp(sum)
+  expsum/(1+expsum)
+}
+
+#function to get diagonal matrix W
+computeW <- function(Pi)
+{
+  vec2diag(Pi*(1-Pi))
+}
+
+#function to get Mu
+computeMu <- function(Pi)
+{
+  1*Pi
+}
+
+#function to compute logit
+computeLogit <- function(Pi) {
+  log(Pi/(1-Pi))
+}
+
+#Newton-Raphson Method for Logistic Regression
+NewtonsMethod <- function(start = rep(0,10),tol = 1e-8)
+{
+  #initial values
+  previousB <- start
+  previousPi <- computePi(previousB)
+  previousLogit <- computeLogit(previousPi)
+  
+  #next iteration values
+  currentB <- previousB + solve(XT %*% computeW(previousPi) %*% Xstar) %*% XT %*% (Ystar - computeMu(previousPi))
+  currentPi <- computePi(currentB)
+  currentLogit <- computeLogit(currentPi)
+  
+  while (ssquares(previousLogit, currentLogit) > tol) {
+    previousB <- currentB
+    previousPi <- computePi(previousB)
+    previousLogit <- computeLogit(previousPi)
+    
+    currentB <- previousB + solve(XT %*% computeW(previousPi) %*% Xstar) %*% XT %*% (Ystar - computeMu(previousPi))
+    currentPi <- computePi(currentB)
+    currentLogit <- computeLogit(currentPi)
+    print(currentLogit)
+  }
+  currentB
+}
+
+#minimizing the change in log odds ratio
+result <- NewtonsMethod(
+  rep(0,10),
+  tol = 1e-8)
+
+#results - the optimized betas
+print(result)
+
+#check against R logit function
+mylogit <- glm(Class ~ Cl.thickness + Cell.size + Cell.shape + Marg.adhesion + Epith.c.size + Bare.nuclei + Bl.cromatin + Normal.nucleoli + Mitoses, data = data, family = "binomial")
+summary(mylogit)
